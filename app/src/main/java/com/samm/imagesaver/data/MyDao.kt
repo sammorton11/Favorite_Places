@@ -14,6 +14,9 @@ interface MyDao {
     @Query("SELECT * FROM my_table ORDER BY id ASC")
     fun readPlace(): LiveData<List<Place>>
 
+    @Query("DELETE FROM my_table")
+    fun deleteAllPlaces()
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlace(place: Place)
 

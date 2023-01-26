@@ -1,13 +1,11 @@
 package com.samm.imagesaver
 
-import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -17,9 +15,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samm.imagesaver.domain.Place
 import com.samm.imagesaver.presentation.MyAdapter
 import com.samm.imagesaver.presentation.MyViewModel
-import com.samm.imagesaver.util.Converters
+import com.samm.imagesaver.core.Converters
 
-// TODO - pass data to a new fragment for details screen - open maps from there instead of here
 
 class PlaceListFragment : Fragment(), MyAdapter.OnCardClick {
 
@@ -28,6 +25,7 @@ class PlaceListFragment : Fragment(), MyAdapter.OnCardClick {
     private lateinit var recyclerView: RecyclerView
     private lateinit var openAddPlaceButton: Button
     private lateinit var navController: NavController
+    private lateinit var clearButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +43,8 @@ class PlaceListFragment : Fragment(), MyAdapter.OnCardClick {
         myViewModel = ViewModelProvider(this)[MyViewModel::class.java]
         recyclerView = view.findViewById(R.id.recycler_view)!!
         openAddPlaceButton = view.findViewById(R.id.open_add_place_screen)!!
+        clearButton = view.findViewById(R.id.clear_all_places)
+
         adapter = MyAdapter(this)
 
         navControllerSetup()
@@ -54,19 +54,10 @@ class PlaceListFragment : Fragment(), MyAdapter.OnCardClick {
         openAddPlaceButton.setOnClickListener {
             navController.navigate(R.id.newPlaceFragment)
         }
-
+        clearButton.setOnClickListener {
+            myViewModel.clearAllPlaces()
+        }
         return view
-    }
-
-
-    companion object {
-        @JvmStatic
-        fun newInstance(title: String, latitude: Double, longitude: Double) =
-            PlaceListFragment().apply {
-                arguments = Bundle().apply {
-
-                }
-            }
     }
 
     private fun navControllerSetup() {

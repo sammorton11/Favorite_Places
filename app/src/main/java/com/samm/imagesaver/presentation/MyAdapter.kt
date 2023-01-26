@@ -1,22 +1,14 @@
 package com.samm.imagesaver.presentation
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat.startActivity
-import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
-import com.samm.imagesaver.NewPlaceFragment
+import com.bumptech.glide.Glide
 import com.samm.imagesaver.R
 import com.samm.imagesaver.domain.Place
 
@@ -30,7 +22,7 @@ class MyAdapter(
         val title: TextView = itemView.findViewById(R.id.title)
         val description: TextView = itemView.findViewById(R.id.description)
         val imageView: ImageView = itemView.findViewById(R.id.imageView)
-        val card: ConstraintLayout = itemView.findViewById(R.id.card)
+        val card: CardView = itemView.findViewById(R.id.card)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -45,7 +37,17 @@ class MyAdapter(
         holder.title.text
         holder.title.text = place[position].title
         holder.description.text = place[position].description
-        holder.imageView.load(place[position].image)
+        //holder.imageView.load(place[position].image)
+
+        val context = holder.imageView.context
+        val imageUrl = place[position].image
+        val imageView = holder.imageView
+
+        Glide.with(context)
+            .load(imageUrl)
+            .override(750, 500) // resizing
+            .centerCrop()
+            .into(imageView)
 
         holder.card.setOnClickListener {
             cardClick.onCardClick(place[position])

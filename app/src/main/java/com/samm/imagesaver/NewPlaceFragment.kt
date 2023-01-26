@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
@@ -24,18 +23,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
-import coil.ImageLoader
-import coil.load
-import coil.request.ErrorResult
-import coil.request.ImageRequest
-import coil.request.SuccessResult
+import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.samm.imagesaver.core.Converters
 import com.samm.imagesaver.domain.Place
 import com.samm.imagesaver.presentation.MyViewModel
-import com.samm.imagesaver.util.Converters
 import kotlinx.coroutines.launch
-import java.io.ByteArrayOutputStream
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -110,44 +104,26 @@ class NewPlaceFragment : Fragment() {
         }
     }
 
-
-    private suspend fun getBitmap(): Bitmap? {
-        val loading = context?.let { ImageLoader(it) }
-        val request = context?.let {
-            ImageRequest.Builder(it)
-                .data(imageUri)
-                .build()
-        }
-        val result = (request?.let { loading!!.execute(it) })
-
-        return when (result) {
-            is SuccessResult -> (result.drawable as BitmapDrawable).bitmap
-            is ErrorResult -> {
-                throw result.throwable
-            }
-            else -> null
-        }
-    }
-
     private suspend fun createNewPlace(
         title: String,
         description: String,
         latitude: Double,
         longitude: Double
     ) {
-        val place = getBitmap()?.let { image ->
-            Place(
-                title = title,
-                description = description,
-                image = image,
-                latitude = latitude,
-                longitude = longitude
-            )
+        val place = context?.let { context ->
+            myViewModel.getBitmap(context, imageUri)?.let { image ->
+                Place(
+                    title = title,
+                    description = description,
+                    image = image,
+                    latitude = latitude,
+                    longitude = longitude
+                )
+            }
         }
         try {
-            place?.let {
-                myViewModel.insertPlace(it)
-                Log.d("PLACE", "$it")
+            place?.let { newPlace ->
+                myViewModel.insertPlace(newPlace)
             }
         }
         catch (e: Exception){
@@ -167,20 +143,14 @@ class NewPlaceFragment : Fragment() {
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == AppCompatActivity.RESULT_OK) {
             val imageBitmap = data?.extras?.get("data") as Bitmap
             imageUri = Converters.getImageUri(imageBitmap, context)
-            imageView.load(imageUri)
+
+            Glide.with(this)
+                .load(imageUri)
+                .override(850, 1000) // resizing
+                .centerCrop()
+                .into(imageView)
         }
     }
-
-//    private fun getImageUri(imageBitmap: Bitmap): Uri {
-//        val bytes = ByteArrayOutputStream()
-//        val resolver = context?.contentResolver
-//        imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-//        val path =
-//            MediaStore.Images.Media.insertImage(resolver, imageBitmap, "Title", null)
-//        return Uri.parse(path)
-//    }
-
-
 
     // Permissions and Location
     override fun onResume() {
@@ -213,7 +183,6 @@ class NewPlaceFragment : Fragment() {
             if (rationale) {
                 Toast.makeText(activity,"Denied Permission", Toast.LENGTH_LONG).show()
             } else {
-
                 // Request the permission.
                 ActivityCompat.requestPermissions(
                     activity,

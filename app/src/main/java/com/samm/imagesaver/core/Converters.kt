@@ -1,4 +1,4 @@
-package com.samm.imagesaver.util
+package com.samm.imagesaver.core
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -27,8 +27,9 @@ class Converters {
             val bytes = ByteArrayOutputStream()
             val resolver = context?.contentResolver
             imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+            val resized = Bitmap.createScaledBitmap(imageBitmap, 900, 900, true)
             val path =
-                MediaStore.Images.Media.insertImage(resolver, imageBitmap, "Title", null)
+                MediaStore.Images.Media.insertImage(resolver, resized, "Title", null)
             return Uri.parse(path)
         }
     }

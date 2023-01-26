@@ -13,6 +13,13 @@
         android:layout_height="wrap_content"
         android:text="Add New Place" />
 
+    <Button
+        android:id="@+id/clear_all_places"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:text="Clear" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"

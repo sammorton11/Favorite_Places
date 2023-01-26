@@ -11,6 +11,8 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.net.toUri
+import androidx.navigation.fragment.NavHostFragment
+import com.bumptech.glide.Glide
 
 // TODO: Rename parameter arguments, choose names that match
 private const val titleParameter = "title"
@@ -32,23 +34,38 @@ class PlaceDetailsFragment : Fragment() {
     private lateinit var image: ImageView
     private lateinit var description: TextView
     private lateinit var location: Button
+    private lateinit var backButton: Button
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val navHostFragment = activity?.supportFragmentManager
+            ?.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
 
         title = view.findViewById(R.id.title_text)
         image = view.findViewById(R.id.image_preview)
         description = view.findViewById(R.id.description_text)
         location = view.findViewById(R.id.open_maps_button)
+        backButton = view.findViewById(R.id.back_button)
 
         title.text = titleArgument
         description.text = descriptionArgument
-        image.setImageURI(imageArgument?.toUri())
+//        image.setImageURI(imageArgument?.toUri())
+        Glide.with(requireContext())
+            .load(imageArgument?.toUri())
+            .override(650, 500) // resizing
+            .centerCrop()
+            .into(image)
 
         location.setOnClickListener {
             val url = "geo:0,0?q=$latitudeArgument,$longitudeArgument(Label)"
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(intent)
+        }
+
+        backButton.setOnClickListener {
+            navController.popBackStack()
         }
     }
 
@@ -65,18 +82,5 @@ class PlaceDetailsFragment : Fragment() {
         }
 
         return inflater.inflate(R.layout.fragment_place_details, container, false)
-    }
-
-
-    companion object {
-        @JvmStatic
-        fun newInstance(title: String, latitude: Double, longitude: Double) =
-            PlaceDetailsFragment().apply {
-                arguments = Bundle().apply {
-                    putString(titleParameter, title)
-                    putDouble(latitudeParameter, latitude)
-                    putDouble(longitudeParameter, longitude)
-                }
-            }
     }
 }

@@ -11,4 +11,8 @@ class MyRepository(private val myDao: MyDao) {
         myDao.insertPlace(place)
     }
 
+    fun clearAllPlaces() {
+        myDao.deleteAllPlaces()
+    }
+
 }

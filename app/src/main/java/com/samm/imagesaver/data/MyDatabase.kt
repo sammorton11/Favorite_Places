@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.samm.imagesaver.util.Converters
+import com.samm.imagesaver.core.Converters
 import com.samm.imagesaver.domain.Place
 
 @Database(entities = [Place::class], version = 2, exportSchema = false)

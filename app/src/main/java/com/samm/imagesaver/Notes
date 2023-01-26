@@ -1,0 +1,4 @@
+Notes:
+    - Certain devices crash.
+    - Using deprecated code might be the cause of crashes
+    - Need to test on device with API version 29 and 30
